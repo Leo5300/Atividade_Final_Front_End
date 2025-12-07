@@ -1,38 +1,66 @@
 .page {
-  max-width: 1100px;
-  margin: 40px auto;
-  padding: 20px;
+    max-width: 1100px;
+    margin: 50px auto;
+    padding: 30px 20px;
 }
 
 .container {
-  max-width: 1100px;
-  margin: auto;
-  padding: 20px;
+    max-width: 1100px;
+    margin: auto;
+    padding: 20px;
 }
 
 .glass,
 .glass-card {
-  background: rgba(255, 255, 255, 0.5);
-  border-radius: 18px;
-  padding: 28px;
+    background: rgba(255, 255, 255, 0.55);
+    border-radius: 20px;
+    padding: 32px;
 
-  border: 1px solid rgba(64, 200, 180, 0.4);
-  backdrop-filter: blur(18px);
+    border: 1px solid rgba(64, 200, 180, 0.35);
+    backdrop-filter: blur(20px);
 
-  box-shadow: 0 8px 28px rgba(64, 163, 255, 0.22),
-              0 0 14px rgba(60, 230, 180, 0.25);
+    box-shadow:
+        0 8px 26px rgba(64, 163, 255, 0.18),
+        0 0 12px rgba(60, 230, 180, 0.20);
+
+    margin-bottom: 40px;
+
 }
 
 .form {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  margin-top: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    margin-top: 16px;
 }
 
+
 .grid {
-  margin-top: 28px;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 22px;
+    margin-top: 32px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 28px;
+  
+}
+
+
+.card-actions {
+    display: flex;
+    gap: 14px;
+    margin-top: 18px;
+}
+
+.card-actions .btn {
+    flex: 1;
+}
+
+.fade-out {
+    opacity: 1;
+    transform: scale(1);
+    transition: opacity 0.35s ease, transform 0.35s ease;
+}
+
+.fade-out.removendo {
+    opacity: 0;
+    transform: scale(0.92);
 }

@@ -7,28 +7,24 @@ const BASE_URL = "http://localhost:4567";
  * tenta extrair o JSON ou lança um erro com a mensagem do servidor.
  */
 const handleResponse = async (response) => {
-  // Se o status da resposta for 200-299, retorna a resposta
   if (response.ok) {
-    // 204 No Content (como o DELETE) não possui corpo JSON, retorna true
-    if (response.status === 204) return true;
-    
-    // Se a resposta estiver OK (200, 201), tenta ler o JSON
+    if (response.status === 204) return true; // DELETE não tem body
     return response.json();
-  } 
-  
-  // Se o status for de erro (4xx ou 5xx)
+  }
+
   let errorData;
   try {
-    // Tenta ler o corpo como JSON (onde a API Spark retorna a mensagem de erro)
     errorData = await response.json();
-  } catch (e) {
-    // Se não for JSON (ex: erro de servidor simples), lê como texto
+  } catch {
     errorData = await response.text();
   }
-  
-  // Lança um erro com a mensagem do servidor e o status
-  const errorMessage = errorData.mensagem || errorData || `Erro ${response.status}: Falha na requisição.`;
-  throw new Error(errorMessage);
+
+  const message =
+    errorData.mensagem ||
+    errorData ||
+    `Erro ${response.status}: Falha na requisição.`;
+
+  throw new Error(message);
 };
 
 // ============================
@@ -64,7 +60,9 @@ export const updateProduto = async (id, produto) => {
 };
 
 export const deleteProduto = async (id) => {
-  const response = await fetch(`${BASE_URL}/produtos/${id}`, { method: "DELETE" });
+  const response = await fetch(`${BASE_URL}/produtos/${id}`, {
+    method: "DELETE",
+  });
   return handleResponse(response);
 };
 
@@ -101,6 +99,8 @@ export const updateCategoria = async (id, categoria) => {
 };
 
 export const deleteCategoria = async (id) => {
-  const response = await fetch(`${BASE_URL}/categorias/${id}`, { method: "DELETE" });
+  const response = await fetch(`${BASE_URL}/categorias/${id}`, {
+    method: "DELETE",
+  });
   return handleResponse(response);
 };

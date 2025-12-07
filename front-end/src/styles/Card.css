@@ -1,34 +1,38 @@
 .card {
-  background: rgba(255, 255, 255, 0.55);
-  border-radius: 16px;
-  padding: 20px;
-  backdrop-filter: blur(12px);
+  background: rgba(255, 255, 255, 0.60);
+  border-radius: 18px;
+  padding: 26px 22px;
+  backdrop-filter: blur(14px);
 
-  border: 1px solid rgba(64, 200, 180, 0.35);
+  border: 1px solid rgba(64, 200, 180, 0.30);
 
-  box-shadow: 0 6px 20px rgba(64, 163, 255, 0.18),
-              0 0 12px rgba(60, 230, 180, 0.25);
+  box-shadow: 
+      0 6px 16px rgba(64, 163, 255, 0.15),
+      0 0 10px rgba(60, 230, 180, 0.15);
 
   transition: 0.25s;
 }
 
 .card:hover {
   transform: translateY(-3px);
-  box-shadow: 0 10px 26px rgba(64, 163, 255, 0.28),
-              0 0 18px rgba(60, 230, 180, 0.35);
+  box-shadow: 
+      0 10px 24px rgba(64, 163, 255, 0.22),
+      0 0 14px rgba(60, 230, 180, 0.25);
 }
 
-.card-header h3 {
-  margin: 0 0 10px 0;
+.card-header h3,
+.card h3 {
+  margin: 0 0 14px 0;
   font-size: 20px;
-  
-  background: linear-gradient(135deg, #40a3ff, #3fe4a5);
+  font-weight: 700;
+
+  background: linear-gradient(135deg, #5aa9ff, #5ff0c5);
   -webkit-background-clip: text;
   color: transparent;
 }
 
 .card-footer {
-  margin-top: 16px;
+  margin-top: 20px;
   display: flex;
   justify-content: flex-end;
 }
