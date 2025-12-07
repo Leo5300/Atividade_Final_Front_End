@@ -1,0 +1,57 @@
+nav {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box; 
+
+  padding: 16px 28px; 
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  position: sticky;
+  top: 0;
+
+  backdrop-filter: blur(20px);
+  background: rgba(255, 255, 255, 0.45);
+
+  border-bottom: 1px solid rgba(110, 220, 210, 0.4);
+  box-shadow: 0 4px 16px rgba(64, 163, 255, 0.15);
+
+  z-index: 10;
+}
+
+nav strong {
+  font-size: 20px;
+  font-weight: 600;
+  background: linear-gradient(135deg, #40a3ff, #3fe4a5);
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+nav div {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 14px;
+}
+
+nav a {
+  color: #0a2b2b;
+  font-weight: 500;
+
+  padding: 6px 12px;
+  border-radius: 10px;
+
+  transition: 0.2s;
+  white-space: nowrap; 
+}
+
+nav a:hover {
+  background: rgba(64, 163, 255, 0.12);
+}
+
+nav a.active {
+  background: linear-gradient(135deg, #40a3ff33, #3fe4a533);
+  color: #007aff;
+
+  box-shadow: 0 0 8px rgba(64, 163, 255, 0.25);
+}
