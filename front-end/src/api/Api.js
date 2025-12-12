@@ -1,46 +1,54 @@
-// Base URL da API
+// ============================
+// BASE DA API
+// ============================
 const BASE_URL = "http://localhost:4567";
 
-/**
- * Função auxiliar para tratar a resposta do fetch.
- * Verifica se a resposta foi bem-sucedida (response.ok) e
- * tenta extrair o JSON ou lança um erro com a mensagem do servidor.
- */
+// ============================
+// TRATAMENTO PADRÃO DE RESPOSTA
+// (corrige o erro "Body has already been consumed")
+// ============================
 const handleResponse = async (response) => {
   if (response.ok) {
-    if (response.status === 204) return true; // DELETE não tem body
+    if (response.status === 204) return true; // DELETE não retorna body
     return response.json();
   }
 
-  let errorData;
+  // Lê o corpo UMA ÚNICA VEZ
+  const text = await response.text();
+
   try {
-    errorData = await response.json();
+    const json = JSON.parse(text);
+    throw new Error(json.mensagem || "Erro na requisição");
   } catch {
-    errorData = await response.text();
+    throw new Error(text || `Erro ${response.status}`);
   }
-
-  const message =
-    errorData.mensagem ||
-    errorData ||
-    `Erro ${response.status}: Falha na requisição.`;
-
-  throw new Error(message);
 };
 
 // ============================
 // PRODUTOS
 // ============================
 
+// GET - todos os produtos
 export const getProdutos = async () => {
   const response = await fetch(`${BASE_URL}/produtos`);
   return handleResponse(response);
 };
 
+// GET - produto por ID
 export const getProdutoById = async (id) => {
   const response = await fetch(`${BASE_URL}/produtos/${id}`);
   return handleResponse(response);
 };
 
+// GET - produto por nome
+export const getProdutosByNome = async (nome) => {
+  const response = await fetch(
+    `${BASE_URL}/produtos/nome/${encodeURIComponent(nome)}`
+  );
+  return handleResponse(response);
+};
+
+// POST - criar produto
 export const createProduto = async (produto) => {
   const response = await fetch(`${BASE_URL}/produtos`, {
     method: "POST",
@@ -50,6 +58,7 @@ export const createProduto = async (produto) => {
   return handleResponse(response);
 };
 
+// PUT - atualizar produto
 export const updateProduto = async (id, produto) => {
   const response = await fetch(`${BASE_URL}/produtos/${id}`, {
     method: "PUT",
@@ -59,6 +68,7 @@ export const updateProduto = async (id, produto) => {
   return handleResponse(response);
 };
 
+// DELETE - remover produto
 export const deleteProduto = async (id) => {
   const response = await fetch(`${BASE_URL}/produtos/${id}`, {
     method: "DELETE",
@@ -70,16 +80,27 @@ export const deleteProduto = async (id) => {
 // CATEGORIAS
 // ============================
 
+// GET - todas as categorias
 export const getCategorias = async () => {
   const response = await fetch(`${BASE_URL}/categorias`);
   return handleResponse(response);
 };
 
+// GET - categoria por ID
 export const getCategoriaById = async (id) => {
   const response = await fetch(`${BASE_URL}/categorias/${id}`);
   return handleResponse(response);
 };
 
+// GET - categoria por nome
+export const getCategoriasByNome = async (nome) => {
+  const response = await fetch(
+    `${BASE_URL}/categorias/nome/${encodeURIComponent(nome)}`
+  );
+  return handleResponse(response);
+};
+
+// POST - criar categoria
 export const createCategoria = async (categoria) => {
   const response = await fetch(`${BASE_URL}/categorias`, {
     method: "POST",
@@ -89,6 +110,7 @@ export const createCategoria = async (categoria) => {
   return handleResponse(response);
 };
 
+// PUT - atualizar categoria
 export const updateCategoria = async (id, categoria) => {
   const response = await fetch(`${BASE_URL}/categorias/${id}`, {
     method: "PUT",
@@ -98,6 +120,7 @@ export const updateCategoria = async (id, categoria) => {
   return handleResponse(response);
 };
 
+// DELETE - remover categoria
 export const deleteCategoria = async (id) => {
   const response = await fetch(`${BASE_URL}/categorias/${id}`, {
     method: "DELETE",

@@ -6,6 +6,7 @@ import {
   deleteCategoria,
   updateCategoria,
   getCategoriaById,
+  getCategoriasByNome
 } from "../api/Api";
 
 import Card from "../components/Card";
@@ -18,11 +19,21 @@ export default function Categorias() {
 
   const [modalItens, setModalItens] = useState(null);
   const [modalEditar, setModalEditar] = useState(null);
+  const [buscaProdutoModal, setBuscaProdutoModal] = useState("");
 
+  // ============================
   // BUSCA POR ID
+  // ============================
   const [buscaId, setBuscaId] = useState("");
   const [resultadoId, setResultadoId] = useState(null);
-  const [msgBusca, setMsgBusca] = useState("");
+  const [msgBuscaId, setMsgBuscaId] = useState("");
+
+  // ============================
+  // BUSCA POR NOME
+  // ============================
+  const [buscaNome, setBuscaNome] = useState("");
+  const [resultadoNome, setResultadoNome] = useState([]);
+  const [msgBuscaNome, setMsgBuscaNome] = useState("");
 
   const [removendo, setRemovendo] = useState(false);
 
@@ -35,6 +46,9 @@ export default function Categorias() {
     load();
   }, []);
 
+  // ============================
+  // CREATE
+  // ============================
   async function salvarCategoria(e) {
     e.preventDefault();
     if (!nome.trim()) return;
@@ -44,50 +58,79 @@ export default function Categorias() {
     load();
   }
 
+  // ============================
+  // BUSCAR POR ID
+  // ============================
   async function buscarPorId(e) {
     e.preventDefault();
     setResultadoId(null);
+    setMsgBuscaId("");
 
     if (!buscaId.trim()) {
-      setMsgBusca("Informe um ID");
+      setMsgBuscaId("Informe um ID");
       return;
     }
 
     const cat = await getCategoriaById(buscaId);
+
     if (!cat) {
-      setMsgBusca("Categoria não encontrada");
+      setMsgBuscaId("Categoria não encontrada");
       return;
     }
 
     setRemovendo(false);
     setResultadoId(cat);
-    setMsgBusca("");
   }
 
-  function abrirItens(c) {
-    const itens = produtos.filter((p) => p.categoria?.id === c.id);
-    setModalItens({ categoria: c, itens });
-  }
+  // ============================
+  // BUSCAR POR NOME
+  // ============================
+  async function buscarPorNome(e) {
+    e.preventDefault();
+    setResultadoNome([]);
+    setMsgBuscaNome("");
 
-  async function excluir(id) {
-    if (resultadoId && resultadoId.id === id) {
-      setRemovendo(true);
-
-      setTimeout(async () => {
-        setResultadoId(null);
-        await deleteCategoria(id);
-        setModalItens(null);
-        load();
-      }, 350);
-
+    if (!buscaNome.trim()) {
+      setMsgBuscaNome("Informe um nome");
       return;
     }
 
-    await deleteCategoria(id);
-    setModalItens(null);
-    load();
+    const lista = await getCategoriasByNome(buscaNome);
+
+    if (!lista || lista.length === 0) {
+      setMsgBuscaNome("Nenhuma categoria encontrada");
+      return;
+    }
+
+    setResultadoNome(lista);
   }
 
+  function abrirItens(categoria) {
+    const itens = produtos.filter(p => p.categoria?.id === categoria.id);
+    setBuscaProdutoModal("");
+    setModalItens({ categoria, itens });
+  }
+
+  // ============================
+  // DELETE (fade-out)
+  // ============================
+  async function excluir(id) {
+    setRemovendo(true);
+
+    setTimeout(async () => {
+      await deleteCategoria(id);
+      setResultadoId(null);
+      setResultadoNome([]);
+      setModalItens(null);
+      setModalEditar(null);
+      setRemovendo(false);
+      load();
+    }, 350);
+  }
+
+  // ============================
+  // UPDATE
+  // ============================
   async function salvarEdicao() {
     await updateCategoria(modalEditar.id, {
       id: modalEditar.id,
@@ -101,7 +144,7 @@ export default function Categorias() {
   return (
     <div className="page">
 
-      {/* Criar categoria */}
+      {/* NOVA CATEGORIA */}
       <div className="glass">
         <h2>Nova Categoria</h2>
 
@@ -115,8 +158,8 @@ export default function Categorias() {
         </form>
       </div>
 
-      {/* Buscar por ID */}
-      <div className="glass" style={{ marginTop: 20 }}>
+      {/* BUSCA POR ID */}
+      <div className="glass">
         <h2>Buscar Categoria por ID</h2>
 
         <form className="form" onSubmit={buscarPorId}>
@@ -129,31 +172,17 @@ export default function Categorias() {
           <button className="btn primary">Buscar</button>
         </form>
 
-        {msgBusca && <p>{msgBusca}</p>}
+        {msgBuscaId && <p>{msgBuscaId}</p>}
 
         {resultadoId && (
-          <div
-            className={`fade-out ${removendo ? "removendo" : ""}`}
-          >
+          <div className={`fade-out ${removendo ? "removendo" : ""}`}>
             <Card
               title={`${resultadoId.nome} (ID: ${resultadoId.id})`}
               actions={
                 <>
-                  <button className="btn view" onClick={() => abrirItens(resultadoId)}>
-                    Ver itens
-                  </button>
-                  <button
-                    className="btn primary"
-                    onClick={() => setModalEditar(resultadoId)}
-                  >
-                    Editar
-                  </button>
-                  <button
-                    className="btn danger"
-                    onClick={() => excluir(resultadoId.id)}
-                  >
-                    Excluir
-                  </button>
+                  <button className="btn view" onClick={() => abrirItens(resultadoId)}>Ver itens</button>
+                  <button className="btn primary" onClick={() => setModalEditar(resultadoId)}>Editar</button>
+                  <button className="btn danger" onClick={() => excluir(resultadoId.id)}>Excluir</button>
                 </>
               }
             />
@@ -161,7 +190,39 @@ export default function Categorias() {
         )}
       </div>
 
-      {/* Lista geral */}
+      {/* BUSCA POR NOME */}
+      <div className="glass">
+        <h2>Buscar Categoria por Nome</h2>
+
+        <form className="form" onSubmit={buscarPorNome}>
+          <input
+            placeholder="Digite o nome"
+            value={buscaNome}
+            onChange={(e) => setBuscaNome(e.target.value)}
+          />
+          <button className="btn primary">Buscar</button>
+        </form>
+
+        {msgBuscaNome && <p>{msgBuscaNome}</p>}
+
+        <div className="grid">
+          {resultadoNome.map((c) => (
+            <Card
+              key={c.id}
+              title={`${c.nome} (ID: ${c.id})`}
+              actions={
+                <>
+                  <button className="btn view" onClick={() => abrirItens(c)}>Ver itens</button>
+                  <button className="btn primary" onClick={() => setModalEditar(c)}>Editar</button>
+                  <button className="btn danger" onClick={() => excluir(c.id)}>Excluir</button>
+                </>
+              }
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* LISTA GERAL */}
       <div className="grid">
         {categorias.map((c) => (
           <Card
@@ -169,34 +230,36 @@ export default function Categorias() {
             title={`${c.nome} (ID: ${c.id})`}
             actions={
               <>
-                <button className="btn view" onClick={() => abrirItens(c)}>
-                  Ver itens
-                </button>
-                <button className="btn primary" onClick={() => setModalEditar(c)}>
-                  Editar
-                </button>
-                <button className="btn danger" onClick={() => excluir(c.id)}>
-                  Excluir
-                </button>
+                <button className="btn view" onClick={() => abrirItens(c)}>Ver itens</button>
+                <button className="btn primary" onClick={() => setModalEditar(c)}>Editar</button>
+                <button className="btn danger" onClick={() => excluir(c.id)}>Excluir</button>
               </>
             }
           />
         ))}
       </div>
 
-      {/* Modal itens */}
+      {/* MODAL ITENS */}
       {modalItens && (
         <div className="modal-bg" onClick={() => setModalItens(null)}>
           <div className="modal-glass" onClick={(e) => e.stopPropagation()}>
             <h2>{modalItens.categoria.nome}</h2>
 
-            {modalItens.itens.length === 0 && <p>Nenhum produto.</p>}
+            <input
+              placeholder="Buscar produto pelo nome..."
+              value={buscaProdutoModal}
+              onChange={(e) => setBuscaProdutoModal(e.target.value)}
+            />
 
-            {modalItens.itens.map((p) => (
-              <p key={p.id}>
-                {p.nome} — R${p.preco} (ID: {p.id})
-              </p>
-            ))}
+            <div className="modal-content-scroll">
+              {modalItens.itens
+                .filter(p =>
+                  p.nome.toLowerCase().includes(buscaProdutoModal.toLowerCase())
+                )
+                .map(p => (
+                  <p key={p.id}>{p.nome} — R$ {p.preco} (ID: {p.id})</p>
+                ))}
+            </div>
 
             <button className="btn primary" onClick={() => setModalItens(null)}>
               Fechar
@@ -205,7 +268,7 @@ export default function Categorias() {
         </div>
       )}
 
-      {/* Modal editar */}
+      {/* MODAL EDITAR */}
       {modalEditar && (
         <div className="modal-bg" onClick={() => setModalEditar(null)}>
           <div className="modal-glass" onClick={(e) => e.stopPropagation()}>

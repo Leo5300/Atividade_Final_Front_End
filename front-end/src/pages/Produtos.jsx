@@ -6,6 +6,7 @@ import {
   deleteProduto,
   updateProduto,
   getProdutoById,
+  getProdutosByNome,
 } from "../api/Api";
 
 import Card from "../components/Card";
@@ -24,24 +25,43 @@ export default function Produtos() {
 
   const [modalEditar, setModalEditar] = useState(null);
 
-  // Busca por ID
+  // ============================
+  // BUSCA POR ID
+  // ============================
   const [buscaId, setBuscaId] = useState("");
   const [resultadoId, setResultadoId] = useState(null);
-  const [msgBusca, setMsgBusca] = useState("");
+  const [msgBuscaId, setMsgBuscaId] = useState("");
 
+  // ============================
+  // BUSCA POR NOME
+  // ============================
+  const [buscaNome, setBuscaNome] = useState("");
+  const [resultadoNome, setResultadoNome] = useState([]);
+  const [msgBuscaNome, setMsgBuscaNome] = useState("");
+
+  // ============================
+  // UX
+  // ============================
+  const [loading, setLoading] = useState(false);
   const [removendo, setRemovendo] = useState(false);
 
   async function load() {
+    setLoading(true);
     setProdutos(await getProdutos());
     setCategorias(await getCategorias());
+    setLoading(false);
   }
 
   useEffect(() => {
     load();
   }, []);
 
+  // ============================
+  // CREATE
+  // ============================
   async function salvar(e) {
     e.preventDefault();
+    setLoading(true);
 
     await createProduto({
       nome: form.nome,
@@ -51,27 +71,36 @@ export default function Produtos() {
     });
 
     setForm({ nome: "", preco: "", estoque: "", categoria: "" });
-    load();
+    await load();
   }
 
+  // ============================
+  // DELETE (FECHA TUDO + UX)
+  // ============================
   async function excluir(id) {
-    if (resultadoId && resultadoId.id === id) {
-      setRemovendo(true);
+    setRemovendo(true);
+    setLoading(true);
 
-      setTimeout(async () => {
-        setResultadoId(null);
-        await deleteProduto(id);
-        load();
-      }, 350);
+    setTimeout(async () => {
+      await deleteProduto(id);
 
-      return;
-    }
+      setResultadoId(null);
+      setResultadoNome([]);
+      setModalEditar(null);
 
-    await deleteProduto(id);
-    load();
+      await load();
+
+      setRemovendo(false);
+      setLoading(false);
+    }, 350);
   }
 
+  // ============================
+  // UPDATE
+  // ============================
   async function salvarEdicao() {
+    setLoading(true);
+
     await updateProduto(modalEditar.id, {
       nome: modalEditar.nome,
       preco: Number(modalEditar.preco),
@@ -82,33 +111,75 @@ export default function Produtos() {
     });
 
     setModalEditar(null);
-    load();
+    await load();
   }
 
+  // ============================
+  // BUSCAR POR ID
+  // ============================
   async function buscarPorId(e) {
     e.preventDefault();
+    setLoading(true);
+
     setResultadoId(null);
+    setResultadoNome([]);
+    setMsgBuscaId("");
 
     if (!buscaId.trim()) {
-      setMsgBusca("Informe um ID");
+      setMsgBuscaId("Informe um ID");
+      setLoading(false);
       return;
     }
 
     const prod = await getProdutoById(buscaId);
+
     if (!prod) {
-      setMsgBusca("Produto não encontrado");
+      setMsgBuscaId("Produto não encontrado");
+      setLoading(false);
       return;
     }
 
-    setRemovendo(false);
     setResultadoId(prod);
-    setMsgBusca("");
+    setLoading(false);
+  }
+
+  // ============================
+  // BUSCAR POR NOME
+  // ============================
+  async function buscarPorNome(e) {
+    e.preventDefault();
+    setLoading(true);
+
+    setResultadoNome([]);
+    setResultadoId(null);
+    setMsgBuscaNome("");
+
+    if (!buscaNome.trim()) {
+      setMsgBuscaNome("Informe um nome");
+      setLoading(false);
+      return;
+    }
+
+    const lista = await getProdutosByNome(buscaNome);
+
+    if (!lista || lista.length === 0) {
+      setMsgBuscaNome("Nenhum produto encontrado");
+      setLoading(false);
+      return;
+    }
+
+    setResultadoNome(lista);
+    setLoading(false);
   }
 
   return (
     <div className="page">
 
-      {/* Formulário */}
+      {loading && <p style={{ opacity: 0.6 }}>Carregando...</p>}
+
+      {/* ============================
+          NOVO PRODUTO
+      ============================ */}
       <div className="glass">
         <h2>Novo Produto</h2>
 
@@ -149,8 +220,10 @@ export default function Produtos() {
         </form>
       </div>
 
-      {/* Buscar por ID */}
-      <div className="glass" style={{ marginTop: 20 }}>
+      {/* ============================
+          BUSCA POR ID
+      ============================ */}
+      <div className="glass">
         <h2>Buscar Produto por ID</h2>
 
         <form className="form" onSubmit={buscarPorId}>
@@ -163,12 +236,10 @@ export default function Produtos() {
           <button className="btn primary">Buscar</button>
         </form>
 
-        {msgBusca && <p>{msgBusca}</p>}
+        {msgBuscaId && <p>{msgBuscaId}</p>}
 
         {resultadoId && (
-          <div
-            className={`fade-out ${removendo ? "removendo" : ""}`}
-          >
+          <div className={`fade-out ${removendo ? "removendo" : ""}`}>
             <Card
               title={`${resultadoId.nome} (ID: ${resultadoId.id})`}
               actions={
@@ -179,7 +250,6 @@ export default function Produtos() {
                   >
                     Editar
                   </button>
-
                   <button
                     className="btn danger"
                     onClick={() => excluir(resultadoId.id)}
@@ -189,17 +259,64 @@ export default function Produtos() {
                 </>
               }
             >
-              Preço: R$ {resultadoId.preco}
-              <br />
-              Estoque: {resultadoId.estoque}
-              <br />
+              Preço: R$ {resultadoId.preco}<br />
+              Estoque: {resultadoId.estoque}<br />
               Categoria: {resultadoId.categoria?.nome || "Nenhuma"}
             </Card>
           </div>
         )}
       </div>
 
-      {/* Lista geral */}
+      {/* ============================
+          BUSCA POR NOME
+      ============================ */}
+      <div className="glass">
+        <h2>Buscar Produto por Nome</h2>
+
+        <form className="form" onSubmit={buscarPorNome}>
+          <input
+            placeholder="Digite o nome"
+            value={buscaNome}
+            onChange={(e) => setBuscaNome(e.target.value)}
+          />
+          <button className="btn primary">Buscar</button>
+        </form>
+
+        {msgBuscaNome && <p>{msgBuscaNome}</p>}
+
+        <div className="grid">
+          {resultadoNome.map((p) => (
+            <Card
+              key={p.id}
+              title={`${p.nome} (ID: ${p.id})`}
+              actions={
+                <>
+                  <button
+                    className="btn primary"
+                    onClick={() => setModalEditar(p)}
+                  >
+                    Editar
+                  </button>
+                  <button
+                    className="btn danger"
+                    onClick={() => excluir(p.id)}
+                  >
+                    Excluir
+                  </button>
+                </>
+              }
+            >
+              Preço: R$ {p.preco}<br />
+              Estoque: {p.estoque}<br />
+              Categoria: {p.categoria?.nome || "Nenhuma"}
+            </Card>
+          ))}
+        </div>
+      </div>
+
+      {/* ============================
+          LISTA GERAL
+      ============================ */}
       <div className="grid">
         {produtos.map((p) => (
           <Card
@@ -207,66 +324,74 @@ export default function Produtos() {
             title={`${p.nome} (ID: ${p.id})`}
             actions={
               <>
-                <button className="btn primary" onClick={() => setModalEditar(p)}>
+                <button
+                  className="btn primary"
+                  onClick={() => setModalEditar(p)}
+                >
                   Editar
                 </button>
-                <button className="btn danger" onClick={() => excluir(p.id)}>
+                <button
+                  className="btn danger"
+                  onClick={() => excluir(p.id)}
+                >
                   Excluir
                 </button>
               </>
             }
           >
-            Preço: R$ {p.preco}
-            <br />
-            Estoque: {p.estoco}
-            <br />
+            Preço: R$ {p.preco}<br />
+            Estoque: {p.estoque}<br />
             Categoria: {p.categoria?.nome || "Nenhuma"}
           </Card>
         ))}
       </div>
 
-      {/* Modal editar */}
+      {/* ============================
+          MODAL EDITAR
+      ============================ */}
       {modalEditar && (
         <div className="modal-bg" onClick={() => setModalEditar(null)}>
           <div className="modal-glass" onClick={(e) => e.stopPropagation()}>
             <h2>Editar Produto</h2>
 
-            <input
-              value={modalEditar.nome}
-              onChange={(e) =>
-                setModalEditar({ ...modalEditar, nome: e.target.value })
-              }
-            />
+            <div className="modal-content-scroll">
+              <input
+                value={modalEditar.nome}
+                onChange={(e) =>
+                  setModalEditar({ ...modalEditar, nome: e.target.value })
+                }
+              />
 
-            <input
-              type="number"
-              value={modalEditar.preco}
-              onChange={(e) =>
-                setModalEditar({ ...modalEditar, preco: e.target.value })
-              }
-            />
+              <input
+                type="number"
+                value={modalEditar.preco}
+                onChange={(e) =>
+                  setModalEditar({ ...modalEditar, preco: e.target.value })
+                }
+              />
 
-            <input
-              type="number"
-              value={modalEditar.estoque}
-              onChange={(e) =>
-                setModalEditar({ ...modalEditar, estoque: e.target.value })
-              }
-            />
+              <input
+                type="number"
+                value={modalEditar.estoque}
+                onChange={(e) =>
+                  setModalEditar({ ...modalEditar, estoque: e.target.value })
+                }
+              />
 
-            <select
-              value={modalEditar.categoria}
-              onChange={(e) =>
-                setModalEditar({ ...modalEditar, categoria: e.target.value })
-              }
-            >
-              <option value="">Sem categoria</option>
-              {categorias.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.nome}
-                </option>
-              ))}
-            </select>
+              <select
+                value={modalEditar.categoria || ""}
+                onChange={(e) =>
+                  setModalEditar({ ...modalEditar, categoria: e.target.value })
+                }
+              >
+                <option value="">Sem categoria</option>
+                {categorias.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.nome}
+                  </option>
+                ))}
+              </select>
+            </div>
 
             <button className="btn primary" onClick={salvarEdicao}>
               Salvar

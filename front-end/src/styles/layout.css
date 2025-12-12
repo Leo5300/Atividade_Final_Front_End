@@ -1,3 +1,7 @@
+/* ============================
+   LAYOUT GERAL
+============================ */
+
 .page {
     max-width: 1100px;
     margin: 50px auto;
@@ -9,6 +13,11 @@
     margin: auto;
     padding: 20px;
 }
+
+
+/* ============================
+   GLASS / CARDS
+============================ */
 
 .glass,
 .glass-card {
@@ -24,8 +33,12 @@
         0 0 12px rgba(60, 230, 180, 0.20);
 
     margin-bottom: 40px;
-
 }
+
+
+/* ============================
+   FORMULÁRIOS
+============================ */
 
 .form {
     display: flex;
@@ -35,14 +48,21 @@
 }
 
 
+/* ============================
+   GRID DE CARDS
+============================ */
+
 .grid {
     margin-top: 32px;
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 28px;
-  
 }
 
+
+/* ============================
+   AÇÕES DOS CARDS
+============================ */
 
 .card-actions {
     display: flex;
@@ -54,6 +74,11 @@
     flex: 1;
 }
 
+
+/* ============================
+   ANIMAÇÃO DE REMOÇÃO (FADE-OUT)
+============================ */
+
 .fade-out {
     opacity: 1;
     transform: scale(1);
@@ -63,4 +88,106 @@
 .fade-out.removendo {
     opacity: 0;
     transform: scale(0.92);
+}
+
+
+/* ============================
+   MODAL
+============================ */
+
+.modal-bg {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.28);
+    backdrop-filter: blur(6px);
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    z-index: 999;
+}
+
+.modal-glass {
+    width: 420px;
+    max-height: 80vh;
+
+    padding: 32px;
+    border-radius: 22px;
+
+    background: rgba(255, 255, 255, 0.82);
+    border: 1px solid rgba(180, 255, 240, 0.6);
+    backdrop-filter: blur(22px);
+
+    box-shadow:
+        0 14px 32px rgba(0, 0, 0, 0.15),
+        0 0 18px rgba(64, 214, 255, 0.22);
+
+    animation: modalFade 0.25s ease;
+}
+
+@keyframes modalFade {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.modal-glass h2 {
+    margin-top: 0;
+    margin-bottom: 18px;
+    text-align: center;
+}
+
+
+/* ============================
+   CONTEÚDO COM SCROLL (MODAL)
+============================ */
+
+.modal-content-scroll {
+    max-height: 260px;
+    overflow-y: auto;
+    padding-right: 6px;
+    margin-bottom: 20px;
+}
+
+.modal-content-scroll p {
+    margin: 10px 0;
+    font-size: 15px;
+    line-height: 1.4;
+}
+
+
+/* ============================
+   INPUTS DENTRO DOS MODAIS
+   (MENORES HORIZONTALMENTE)
+============================ */
+
+.modal-glass input,
+.modal-glass select {
+    padding: 10px 12px;
+    font-size: 14px;
+    border-radius: 12px;
+
+    width: 85%;
+    /* <<< CONTROLA A LARGURA */
+    max-width: 320px;
+    /* <<< LIMITE MÁXIMO */
+    margin: 0 auto 12px;
+    /* <<< CENTRALIZA */
+    display: block;
+}
+
+/* Botões do modal também mais contidos */
+.modal-glass .btn {
+    padding: 10px 16px;
+    font-size: 14px;
+    width: fit-content;
+    margin: 0 auto;
+    display: block;
 }

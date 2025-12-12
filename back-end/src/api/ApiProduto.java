@@ -1,10 +1,7 @@
 package api;
 
 import static spark.Spark.*;
-import spark.Request;
-import spark.Response;
-import spark.Route;
-import spark.Filter;
+
 import dao.CategoriaDAO;
 import dao.ProdutoDAO;
 import model.Categoria;
@@ -14,23 +11,22 @@ import com.google.gson.Gson;
 
 public class ApiProduto {
 
-    // instancia do DAO e o GSON
     private static final ProdutoDAO produtoDAO = new ProdutoDAO();
     private static final CategoriaDAO categoriaDAO = new CategoriaDAO();
     private static final Gson gson = new Gson();
 
-    // constante para garantir que todas as respostas sejam JSON
     private static final String APPLICATION_JSON = "application/json";
 
     public static void main(String[] args) {
 
-        // configuração do Servidor
-        port(4567); // Define a porta da API. Acesso via http://localhost:4567
+        // ============================
+        // CONFIGURAÇÃO DO SERVIDOR
+        // ============================
+        port(4567);
 
         // ============================
         // CORS
         // ============================
-
         options("/*", (request, response) -> {
 
             String reqHeaders = request.headers("Access-Control-Request-Headers");
@@ -50,150 +46,189 @@ public class ApiProduto {
             res.header("Access-Control-Allow-Origin", "*");
             res.header("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
             res.header("Access-Control-Allow-Headers", "Content-Type");
+            res.type(APPLICATION_JSON);
         });
 
         // ============================
-        // Rotas
+        // PRODUTOS
         // ============================
 
-        // GET /produtos - Buscar todos
-        get("/produtos", (request, response) -> gson.toJson(produtoDAO.buscarTodos()));
+        // BUSCAR POR NOME (SEMPRE PRIMEIRO)
+        get("/produtos/nome/:nome", (req, res) -> {
+            return gson.toJson(
+                produtoDAO.buscarPorNome(req.params(":nome"))
+            );
+        });
 
-        // GET /produtos/:id - Buscar por ID
-        get("/produtos/:id", (request, response) -> {
+        // BUSCAR TODOS
+        get("/produtos", (req, res) -> {
+            return gson.toJson(produtoDAO.buscarTodos());
+        });
+
+        // BUSCAR POR ID
+        get("/produtos/:id", (req, res) -> {
             try {
-                Long id = Long.parseLong(request.params(":id"));
+                Long id = Long.parseLong(req.params(":id"));
                 Produto produto = produtoDAO.buscarPorId(id);
-                if (produto != null) {
-                    return gson.toJson(produto);
-                } else {
-                    response.status(404);
-                    return "{\"mensagem\": \"Produto com ID " + id + " não encontrado\"}";
+
+                if (produto == null) {
+                    res.status(404);
+                    return "{\"mensagem\":\"Produto não encontrado\"}";
                 }
+
+                return gson.toJson(produto);
+
             } catch (NumberFormatException e) {
-                response.status(400);
-                return "{\"mensagem\": \"Formato de ID inválido.\"}";
+                res.status(400);
+                return "{\"mensagem\":\"ID inválido\"}";
             }
         });
 
-        // POST /produtos - Criar novo produto
-        post("/produtos", (request, response) -> {
+        // CRIAR PRODUTO
+        post("/produtos", (req, res) -> {
             try {
-                Produto novoProduto = gson.fromJson(request.body(), Produto.class);
-                produtoDAO.inserir(novoProduto);
-                response.status(201);
-                return gson.toJson(novoProduto);
+                Produto produto = gson.fromJson(req.body(), Produto.class);
+                produtoDAO.inserir(produto);
+                res.status(201);
+                return gson.toJson(produto);
             } catch (Exception e) {
-                response.status(500);
-                return "{\"mensagem\": \"Erro ao criar produto.\"}";
+                res.status(500);
+                return "{\"mensagem\":\"Erro ao criar produto\"}";
             }
         });
 
-        // PUT /produtos/:id - Atualizar produto existente
-        put("/produtos/:id", (request, response) -> {
+        // ATUALIZAR PRODUTO
+        put("/produtos/:id", (req, res) -> {
             try {
-                Long id = Long.parseLong(request.params(":id"));
+                Long id = Long.parseLong(req.params(":id"));
+
                 if (produtoDAO.buscarPorId(id) == null) {
-                    response.status(404);
-                    return "{\"mensagem\": \"Produto não encontrado para atualização.\"}";
+                    res.status(404);
+                    return "{\"mensagem\":\"Produto não encontrado\"}";
                 }
-                Produto produtoParaAtualizar = gson.fromJson(request.body(), Produto.class);
-                produtoParaAtualizar.setId(id);
-                produtoDAO.atualizar(produtoParaAtualizar);
-                response.status(200);
-                return gson.toJson(produtoParaAtualizar);
+
+                Produto produto = gson.fromJson(req.body(), Produto.class);
+                produto.setId(id);
+                produtoDAO.atualizar(produto);
+
+                return gson.toJson(produto);
+
             } catch (Exception e) {
-                response.status(500);
-                return "{\"mensagem\": \"Erro ao atualizar produto.\"}";
+                res.status(500);
+                return "{\"mensagem\":\"Erro ao atualizar produto\"}";
             }
         });
 
-        // DELETE /produtos/:id - Deletar um produto
-        delete("/produtos/:id", (request, response) -> {
+        // DELETAR PRODUTO
+        delete("/produtos/:id", (req, res) -> {
             try {
-                Long id = Long.parseLong(request.params(":id"));
+                Long id = Long.parseLong(req.params(":id"));
+
                 if (produtoDAO.buscarPorId(id) == null) {
-                    response.status(404);
-                    return "{\"mensagem\": \"Produto não encontrado para exclusão.\"}";
+                    res.status(404);
+                    return "{\"mensagem\":\"Produto não encontrado\"}";
                 }
+
                 produtoDAO.deletar(id);
-                response.status(204);
+                res.status(204);
                 return "";
+
             } catch (Exception e) {
-                response.status(400);
-                return "{\"mensagem\": \"Formato de ID inválido.\"}";
+                res.status(400);
+                return "{\"mensagem\":\"ID inválido\"}";
             }
         });
 
-        // GET /categorias - Buscar todos
-        get("/categorias", (request, response) -> gson.toJson(categoriaDAO.buscarTodos()));
+        // ============================
+        // CATEGORIAS
+        // ============================
 
-        // GET /categorias/:id
-        get("/categorias/:id", (request, response) -> {
+        // BUSCAR POR NOME (PRIMEIRO)
+        get("/categorias/nome/:nome", (req, res) -> {
+            return gson.toJson(
+                categoriaDAO.buscarPorNome(req.params(":nome"))
+            );
+        });
+
+        // BUSCAR TODAS
+        get("/categorias", (req, res) -> {
+            return gson.toJson(categoriaDAO.buscarTodos());
+        });
+
+        // BUSCAR POR ID
+        get("/categorias/:id", (req, res) -> {
             try {
-                Long id = Long.parseLong(request.params(":id"));
+                Long id = Long.parseLong(req.params(":id"));
                 Categoria categoria = categoriaDAO.buscarPorId(id);
-                if (categoria != null) {
-                    return gson.toJson(categoria);
-                } else {
-                    response.status(404);
-                    return "{\"mensagem\": \"Categoria com ID " + id + " não encontrado\"}";
+
+                if (categoria == null) {
+                    res.status(404);
+                    return "{\"mensagem\":\"Categoria não encontrada\"}";
                 }
-            } catch (Exception e) {
-                response.status(400);
-                return "{\"mensagem\": \"Formato de ID inválido.\"}";
+
+                return gson.toJson(categoria);
+
+            } catch (NumberFormatException e) {
+                res.status(400);
+                return "{\"mensagem\":\"ID inválido\"}";
             }
         });
 
-        // POST /categorias
-        post("/categorias", (request, response) -> {
+        // CRIAR CATEGORIA
+        post("/categorias", (req, res) -> {
             try {
-                Categoria novaCategoria = gson.fromJson(request.body(), Categoria.class);
-                categoriaDAO.inserir(novaCategoria);
-                response.status(201);
-                return gson.toJson(novaCategoria);
+                Categoria categoria = gson.fromJson(req.body(), Categoria.class);
+                categoriaDAO.inserir(categoria);
+                res.status(201);
+                return gson.toJson(categoria);
             } catch (Exception e) {
-                response.status(500);
-                return "{\"mensagem\": \"Erro ao criar categoria.\"}";
+                res.status(500);
+                return "{\"mensagem\":\"Erro ao criar categoria\"}";
             }
         });
 
-        // PUT /categorias/:id
-        put("/categorias/:id", (request, response) -> {
+        // ATUALIZAR CATEGORIA
+        put("/categorias/:id", (req, res) -> {
             try {
-                Long id = Long.parseLong(request.params(":id"));
+                Long id = Long.parseLong(req.params(":id"));
+
                 if (categoriaDAO.buscarPorId(id) == null) {
-                    response.status(404);
-                    return "{\"mensagem\": \"Categoria não encontrada para atualização.\"}";
+                    res.status(404);
+                    return "{\"mensagem\":\"Categoria não encontrada\"}";
                 }
-                Categoria categoriaParaAtualizar = gson.fromJson(request.body(), Categoria.class);
-                categoriaParaAtualizar.setId(id);
-                categoriaDAO.atualizar(categoriaParaAtualizar);
-                response.status(200);
-                return gson.toJson(categoriaParaAtualizar);
+
+                Categoria categoria = gson.fromJson(req.body(), Categoria.class);
+                categoria.setId(id);
+                categoriaDAO.atualizar(categoria);
+
+                return gson.toJson(categoria);
+
             } catch (Exception e) {
-                response.status(500);
-                return "{\"mensagem\": \"Erro ao atualizar categoria.\"}";
+                res.status(500);
+                return "{\"mensagem\":\"Erro ao atualizar categoria\"}";
             }
         });
 
-        // DELETE /categorias/:id
-        delete("/categorias/:id", (request, response) -> {
+        // DELETAR CATEGORIA
+        delete("/categorias/:id", (req, res) -> {
             try {
-                Long id = Long.parseLong(request.params(":id"));
+                Long id = Long.parseLong(req.params(":id"));
+
                 if (categoriaDAO.buscarPorId(id) == null) {
-                    response.status(404);
-                    return "{\"mensagem\": \"Categoria não encontrada para exclusão.\"}";
+                    res.status(404);
+                    return "{\"mensagem\":\"Categoria não encontrada\"}";
                 }
+
                 categoriaDAO.deletar(id);
-                response.status(204);
+                res.status(204);
                 return "";
+
             } catch (Exception e) {
-                response.status(500);
-                return "{\"mensagem\": \"Erro ao deletar categoria.\"}";
+                res.status(500);
+                return "{\"mensagem\":\"Erro ao deletar categoria\"}";
             }
         });
 
-        System.out.println("API de Produtos iniciada na porta 4567.");
+        System.out.println("API iniciada em http://localhost:4567");
     }
 }
