@@ -25,27 +25,37 @@ O objetivo é demonstrar a comunicação entre Front-End e Back-End com total fu
 
 ---
 
-#  2. Estrutura do Repositório
+#  2. Estrutura do Repositório e acesso
 
 O repositório está organizado da seguinte forma:
 
-app_frontProdutos
-BackEnd – código completo do servidor Java
-FrontEnd – código completo da aplicação React
-READme.pdf – versão em PDF do guia de execução
+back-end/ – código completo do servidor Java
+front-end/ – código completo da aplicação React
+README - guia de execução
+
+Passo 1: Clonar o repositório: git clone https://github.com/SEU_USUARIO/Atividade_Final_Front_End.git
+Passo 2: Acessar a pasta principal do projeto: cd Atividade_Final_Front_End
+Passo 3: Acessar a pasta do Front-End:cd front-end
+Passo 4: Voltar para a pasta raiz: cd ..
+Passo 5: Acessar a pasta do Back-End: cd back-end
 
 ---
 
 #  3. Banco de Dados (MySQL)
 
-O script SQL utilizado está em BackEnd/aulajdbc.sql.
-Ele é responsável por criar o banco aulajdbc, as tabelas categorias e produtos e definir o relacionamento entre elas.
+O script SQL utilizado no projeto está localizado em:
+back-end/aulajdbc.sql
 
-O script inclui dados iniciais apenas para facilitar o primeiro teste:
+Esse script é responsável por:
+
+Criar o banco de dados aulajdbc
+Criar as tabelas categorias e produtos
+Definir o relacionamento entre as tabelas
+
+O script também inclui dados iniciais para facilitar o primeiro teste da aplicação:
+
 • Categoria inicial: Eletrônicos (ID 1)
 • Produto inicial: Celular Samsung Galaxy S25 Ultra 5G (ID 1), vinculado à categoria Eletrônicos
-
-Esses dados podem ser alterados livremente pela aplicação.
 
 ---
 
@@ -123,5 +133,9 @@ DELETE /produtos/{id} – remove produto
 7. Confirmar comportamento da exclusão de categorias (produtos ficam sem categoria).
 8. Validar a integração total entre as camadas.
 
+ ---
 
+# 8. Considerações Finais
+
+Este projeto demonstra, de forma prática, a integração entre Front-End e Back-End, reforçando conceitos de APIs REST, arquitetura cliente-servidor e persistência de dados em banco relacional, atendendo integralmente aos requisitos propostos na atividade.
 
