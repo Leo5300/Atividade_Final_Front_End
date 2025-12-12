@@ -106,19 +106,36 @@ A aplicação abrirá automaticamente em:
 Segue uma visão geral dos endpoints consumidos pelo Front-End.
 Os exemplos servem apenas como referência da estrutura utilizada.
 
-Categorias:
-GET /categorias – retorna todas as categorias
-GET /categorias/{id} – retorna categoria específica
-POST /categorias – cria nova categoria
-PUT /categorias/{id} – atualiza categoria
-DELETE /categorias/{id} – exclui categoria (produtos associados ficam sem categoria devido ao ON DELETE SET NULL)
+📁 Categorias
 
-Produtos:
-GET /produtos – retorna todos os produtos
-GET /produtos/{id} – retorna produto específico
-POST /produtos – cria novo produto
-PUT /produtos/{id} – atualiza produto
-DELETE /produtos/{id} – remove produto
+GET /categorias
+Retorna a lista completa de categorias cadastradas.
+GET /categorias/{id}
+Retorna uma categoria específica com base no ID informado.
+GET /categorias/nome/{nome}
+Retorna uma ou mais categorias cujo nome corresponda ao valor informado (busca textual).
+POST /categorias
+Cria uma nova categoria no sistema.
+PUT /categorias/{id}
+Atualiza os dados de uma categoria existente.
+DELETE /categorias/{id}
+Remove uma categoria.
+Caso existam produtos associados, eles permanecem no sistema, porém ficam sem categoria, conforme a regra ON DELETE SET NULL definida no banco de dados.
+
+📦 Produtos
+
+GET /produtos
+Retorna a lista completa de produtos cadastrados.
+GET /produtos/{id}
+Retorna um produto específico com base no ID informado.
+GET /produtos/nome/{nome}
+Retorna uma lista de produtos cujo nome corresponda ao valor informado (busca textual).
+POST /produtos
+Cria um novo produto, podendo ou não estar associado a uma categoria.
+PUT /produtos/{id}
+Atualiza os dados de um produto existente.
+DELETE /produtos/{id}
+Remove um produto do sistema.
 
 ---
 
