@@ -35,9 +35,13 @@ front-end/ – código completo da aplicação React
 README - guia de execução
 
 Passo 1: Clonar o repositório: git clone https://github.com/SEU_USUARIO/Atividade_Final_Front_End.git
+
 Passo 2: Acessar a pasta principal do projeto: cd Atividade_Final_Front_End
+
 Passo 3: Acessar a pasta do Front-End:cd front-end
+
 Passo 4: Voltar para a pasta raiz: cd ..
+
 Passo 5: Acessar a pasta do Back-End: cd back-end
 
 ---
@@ -111,14 +115,19 @@ Os exemplos servem apenas como referência da estrutura utilizada.
 
 GET /categorias
 Retorna a lista completa de categorias cadastradas.
+
 GET /categorias/{id}
 Retorna uma categoria específica com base no ID informado.
+
 GET /categorias/nome/{nome}
 Retorna uma ou mais categorias cujo nome corresponda ao valor informado (busca textual).
+
 POST /categorias
 Cria uma nova categoria no sistema.
+
 PUT /categorias/{id}
 Atualiza os dados de uma categoria existente.
+
 DELETE /categorias/{id}
 Remove uma categoria.
 Caso existam produtos associados, eles permanecem no sistema, porém ficam sem categoria, conforme a regra ON DELETE SET NULL definida no banco de dados.
@@ -127,14 +136,19 @@ Caso existam produtos associados, eles permanecem no sistema, porém ficam sem c
 
 GET /produtos
 Retorna a lista completa de produtos cadastrados.
+
 GET /produtos/{id}
 Retorna um produto específico com base no ID informado.
+
 GET /produtos/nome/{nome}
 Retorna uma lista de produtos cujo nome corresponda ao valor informado (busca textual).
+
 POST /produtos
 Cria um novo produto, podendo ou não estar associado a uma categoria.
+
 PUT /produtos/{id}
 Atualiza os dados de um produto existente.
+
 DELETE /produtos/{id}
 Remove um produto do sistema.
 
