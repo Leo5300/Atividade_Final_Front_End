@@ -174,18 +174,24 @@ export default function Produtos() {
 
   return (
     <div className="page">
-
-      {loading && <p style={{ opacity: 0.6 }}>Carregando...</p>}
+      {loading && <p className="muted">Carregando...</p>}
 
       {/* ============================
           NOVO PRODUTO
       ============================ */}
       <div className="glass">
-        <h2>Novo Produto</h2>
+        <div className="section-header">
+          <div>
+            <h2>Novo Produto</h2>
+            <p className="section-subtitle">
+              Cadastre itens com preço, estoque e categoria.
+            </p>
+          </div>
+        </div>
 
-        <form className="form" onSubmit={salvar}>
+        <form className="form form-grid" onSubmit={salvar}>
           <input
-            placeholder="Nome"
+            placeholder="Nome do produto"
             value={form.nome}
             onChange={(e) => setForm({ ...form, nome: e.target.value })}
           />
@@ -216,7 +222,9 @@ export default function Produtos() {
             ))}
           </select>
 
-          <button className="btn primary">Salvar</button>
+          <div className="form-actions">
+            <button className="btn primary">Salvar</button>
+          </div>
         </form>
       </div>
 
@@ -224,12 +232,19 @@ export default function Produtos() {
           BUSCA POR ID
       ============================ */}
       <div className="glass">
-        <h2>Buscar Produto por ID</h2>
+        <div className="section-header">
+          <div>
+            <h2>Buscar Produto por ID</h2>
+            <p className="section-subtitle">
+              Ideal para consultas rápidas no caixa ou estoque.
+            </p>
+          </div>
+        </div>
 
-        <form className="form" onSubmit={buscarPorId}>
+        <form className="form form-inline" onSubmit={buscarPorId}>
           <input
             type="number"
-            placeholder="ID"
+            placeholder="Digite o ID do produto"
             value={buscaId}
             onChange={(e) => setBuscaId(e.target.value)}
           />
@@ -271,11 +286,18 @@ export default function Produtos() {
           BUSCA POR NOME
       ============================ */}
       <div className="glass">
-        <h2>Buscar Produto por Nome</h2>
+        <div className="section-header">
+          <div>
+            <h2>Buscar Produto por Nome</h2>
+            <p className="section-subtitle">
+              Encontre itens mesmo com variações no nome.
+            </p>
+          </div>
+        </div>
 
-        <form className="form" onSubmit={buscarPorNome}>
+        <form className="form form-inline" onSubmit={buscarPorNome}>
           <input
-            placeholder="Digite o nome"
+            placeholder="Digite o nome do produto"
             value={buscaNome}
             onChange={(e) => setBuscaNome(e.target.value)}
           />
@@ -285,6 +307,9 @@ export default function Produtos() {
         {msgBuscaNome && <p>{msgBuscaNome}</p>}
 
         <div className="grid">
+          {resultadoNome.length === 0 && !msgBuscaNome && (
+            <p className="empty-state">Nenhum resultado para exibir.</p>
+          )}
           {resultadoNome.map((p) => (
             <Card
               key={p.id}
@@ -317,7 +342,18 @@ export default function Produtos() {
       {/* ============================
           LISTA GERAL
       ============================ */}
+      <div className="section-header">
+        <div>
+          <h2>Todos os Produtos</h2>
+          <p className="section-subtitle">
+            Total cadastrado: <span className="badge">{produtos.length}</span>
+          </p>
+        </div>
+      </div>
       <div className="grid">
+        {produtos.length === 0 && (
+          <p className="empty-state">Cadastre o primeiro produto para começar.</p>
+        )}
         {produtos.map((p) => (
           <Card
             key={p.id}

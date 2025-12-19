@@ -146,9 +146,16 @@ export default function Categorias() {
 
       {/* NOVA CATEGORIA */}
       <div className="glass">
-        <h2>Nova Categoria</h2>
+        <div className="section-header">
+          <div>
+            <h2>Nova Categoria</h2>
+            <p className="section-subtitle">
+              Organize os produtos para uma navegação rápida.
+            </p>
+          </div>
+        </div>
 
-        <form className="form" onSubmit={salvarCategoria}>
+        <form className="form form-inline" onSubmit={salvarCategoria}>
           <input
             placeholder="Nome da categoria"
             value={nome}
@@ -160,12 +167,19 @@ export default function Categorias() {
 
       {/* BUSCA POR ID */}
       <div className="glass">
-        <h2>Buscar Categoria por ID</h2>
+        <div className="section-header">
+          <div>
+            <h2>Buscar Categoria por ID</h2>
+            <p className="section-subtitle">
+              Ideal para manutenção rápida do cadastro.
+            </p>
+          </div>
+        </div>
 
-        <form className="form" onSubmit={buscarPorId}>
+        <form className="form form-inline" onSubmit={buscarPorId}>
           <input
             type="number"
-            placeholder="ID"
+            placeholder="Digite o ID da categoria"
             value={buscaId}
             onChange={(e) => setBuscaId(e.target.value)}
           />
@@ -192,11 +206,18 @@ export default function Categorias() {
 
       {/* BUSCA POR NOME */}
       <div className="glass">
-        <h2>Buscar Categoria por Nome</h2>
+        <div className="section-header">
+          <div>
+            <h2>Buscar Categoria por Nome</h2>
+            <p className="section-subtitle">
+              Procure categorias por palavras-chave.
+            </p>
+          </div>
+        </div>
 
-        <form className="form" onSubmit={buscarPorNome}>
+        <form className="form form-inline" onSubmit={buscarPorNome}>
           <input
-            placeholder="Digite o nome"
+            placeholder="Digite o nome da categoria"
             value={buscaNome}
             onChange={(e) => setBuscaNome(e.target.value)}
           />
@@ -206,6 +227,9 @@ export default function Categorias() {
         {msgBuscaNome && <p>{msgBuscaNome}</p>}
 
         <div className="grid">
+          {resultadoNome.length === 0 && !msgBuscaNome && (
+            <p className="empty-state">Nenhum resultado para exibir.</p>
+          )}
           {resultadoNome.map((c) => (
             <Card
               key={c.id}
@@ -223,7 +247,18 @@ export default function Categorias() {
       </div>
 
       {/* LISTA GERAL */}
+      <div className="section-header">
+        <div>
+          <h2>Todas as Categorias</h2>
+          <p className="section-subtitle">
+            Total cadastrado: <span className="badge">{categorias.length}</span>
+          </p>
+        </div>
+      </div>
       <div className="grid">
+        {categorias.length === 0 && (
+          <p className="empty-state">Cadastre a primeira categoria.</p>
+        )}
         {categorias.map((c) => (
           <Card
             key={c.id}
