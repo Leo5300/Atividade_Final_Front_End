@@ -1,38 +1,20 @@
-.card {
-  background: rgba(255, 255, 255, 0.60);
-  border-radius: 18px;
-  padding: 26px 22px;
-  backdrop-filter: blur(14px);
-
-  border: 1px solid rgba(64, 200, 180, 0.30);
-
-  box-shadow: 
-      0 6px 16px rgba(64, 163, 255, 0.15),
-      0 0 10px rgba(60, 230, 180, 0.15);
-
-  transition: 0.25s;
+.glass-card {
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.card:hover {
-  transform: translateY(-3px);
-  box-shadow: 
-      0 10px 24px rgba(64, 163, 255, 0.22),
-      0 0 14px rgba(60, 230, 180, 0.25);
-}
-
-.card-header h3,
-.card h3 {
-  margin: 0 0 14px 0;
-  font-size: 20px;
+.glass-card h3 {
+  margin: 0 0 12px;
+  font-size: 18px;
   font-weight: 700;
-
-  background: linear-gradient(135deg, #5aa9ff, #5ff0c5);
-  -webkit-background-clip: text;
-  color: transparent;
+  color: var(--text);
 }
 
-.card-footer {
-  margin-top: 20px;
-  display: flex;
-  justify-content: flex-end;
+.glass-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 30px rgba(15, 23, 42, 0.12);
 }
